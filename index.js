@@ -9,6 +9,7 @@ app.use(express.json());
 
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const req = require('express/lib/request');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.rsztvpo.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -31,6 +32,26 @@ async function run() {
         // for load the basic menu 
         app.get('/menu', async (req, res) => {
             const result = await menuCollection.find().toArray();
+            res.send(result)
+        })
+
+        // for cart collection 
+        app.get('/carts', async (req, res) => {
+            const email = req.query.email;
+            console.log(email);
+            if (!email) {
+                res.send([]);
+            }
+            const query = { email: email };
+            const result = await cartsCollection.find(query).toArray();
+            res.send(result)
+        })
+
+        // for add to cart collection 
+        app.post('/carts', async (req, res) => {
+            const item = req.body;
+            console.log(item);
+            const result = await cartsCollection.insertOne(item);
             res.send(result)
         })
 
